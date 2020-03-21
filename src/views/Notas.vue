@@ -37,7 +37,8 @@
           <td>{{ nota.nombre }}</td>
           <td>{{ nota.descripcion }}</td>
           <td>
-            <b-button @click="alerta">Accion</b-button>
+       <!--      <b-button @click="alerta">Accion</b-button> -->
+            <b-button @click="eliminarNota(nota._id)" class="btn-danger">Eliminar</b-button>
           </td>
         </tr>
       </tbody>
@@ -92,6 +93,20 @@ export default {
           this.mensaje.texto = e.response.data.mensaje;
           this.showAlert()
         });
+    },
+    eliminarNota(id){
+      console.log(id)
+      this.axios.delete('/nota/'+ id).
+        then(res => {
+          const index = this.notas.findIndex(item => item._id === res.data._id) //obtenemos el index del elemento que coincide con el que eliminamos
+          this.notas.splice(index, 1)
+          this.mensaje.color = "success";
+          this.mensaje.texto = "Nota eliminada";
+          this.showAlert()
+        })
+        .catch(e => {
+          console.log(e.response)
+        })
     },
     countDownChanged(dismissCountDown) { //propio de alert
       this.dismissCountDown = dismissCountDown;
