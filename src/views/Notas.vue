@@ -2,6 +2,14 @@
   <div class="container">
     <h1>Notas</h1>
 
+    <b-alert
+      :show="dismissCountDown"
+      dismissible
+      :variant="mensaje.color"
+      @dismissed="dismissCountDown=0"
+      @dismiss-count-down="countDownChanged"
+    >{{mensaje.texto}}</b-alert>
+
     <table class="table">
       <thead class="thead-dark">
         <tr>
@@ -16,7 +24,9 @@
           <th scope="row">{{ nota._id }}</th>
           <td>{{ nota.nombre }}</td>
           <td>{{ nota.descripcion }}</td>
-          <td>{{ nota.activo }}</td>
+          <td>
+            <b-button @click="alerta">Accion</b-button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -25,25 +35,40 @@
 
 <script>
 export default {
-    data(){
-        return{
-            notas: []
-        }
+  data() {
+    return {
+      notas: [],
+      mensaje: { color: "success", texto: "" },
+      dismissSecs: 5,
+      dismissCountDown: 0
+    };
+  },
+  created() {
+    this.listarNotas();
+  },
+  methods: {
+    alerta() {
+      this.mensaje.color = "success";
+      this.mensaje.texto = "Probando alerta";
+      this.showAlert();
     },
-    created(){
-        this.listarNotas()
+    listarNotas() {
+      this.axios
+        .get("/notas")
+        .then(res => {
+          console.table(res.data);
+          this.notas = res.data;
+        })
+        .catch(e => {
+          console.log(e.response);
+        });
     },
-    methods: {
-        listarNotas(){
-            this.axios.get('/notas')
-                .then(res => {
-                    console.table(res.data);
-                    this.notas = res.data;
-                })
-                .catch(e => {
-                    console.log(e.response);
-                })
-        }
+    countDownChanged(dismissCountDown) {
+      this.dismissCountDown = dismissCountDown;
+    },
+    showAlert() {
+      this.dismissCountDown = this.dismissSecs;
     }
-}
+  }
+};
 </script>
