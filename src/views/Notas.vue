@@ -10,6 +10,18 @@
       @dismiss-count-down="countDownChanged"
     >{{mensaje.texto}}</b-alert>
 
+    <form @submit.prevent="agregarNota()">
+      <h3>Agregar nueva nota</h3>
+      <input type="text" class="form-control my-2" placeholder="Nombre" v-model="nota.nombre" />
+      <input
+        type="text"
+        class="form-control my-2"
+        placeholder="Descripcion"
+        v-model="nota.descripcion"
+      />
+      <b-button class="btn-success my-2 btn-block" type="submit">Agregar</b-button>
+    </form>
+
     <table class="table">
       <thead class="thead-dark">
         <tr>
@@ -38,6 +50,7 @@ export default {
   data() {
     return {
       notas: [],
+      nota: { nombre: "", descripcion: "" },
       mensaje: { color: "success", texto: "" },
       dismissSecs: 5,
       dismissCountDown: 0
@@ -53,8 +66,7 @@ export default {
       this.showAlert();
     },
     listarNotas() {
-      this.axios
-        .get("/notas")
+      this.axios.get("/notas")
         .then(res => {
           console.table(res.data);
           this.notas = res.data;
@@ -63,10 +75,28 @@ export default {
           console.log(e.response);
         });
     },
-    countDownChanged(dismissCountDown) {
+    agregarNota() {
+      this.axios.post("/nueva-nota", this.nota)
+        .then(res => {
+          console.log(res.data)
+          this.notas.push(res.data);
+          this.nota.nombre = "";
+          this.nota.descripcion = "";
+          this.mensaje.color = "success";
+          this.mensaje.texto = "Nota agregada";
+          this.showAlert()
+        })
+        .catch(e => {
+          console.log(e.response);
+          this.mensaje.color = "danger";
+          this.mensaje.texto = e.response.data.mensaje;
+          this.showAlert()
+        });
+    },
+    countDownChanged(dismissCountDown) { //propio de alert
       this.dismissCountDown = dismissCountDown;
     },
-    showAlert() {
+    showAlert() { //propio de alert
       this.dismissCountDown = this.dismissSecs;
     }
   }
