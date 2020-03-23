@@ -25,6 +25,15 @@ export default new Vuex.Store({
         console.log(e.response)
       }
     },
+    async postNotes(context, params) {
+      try {
+        const res = await axios.post("/nueva-nota", params)
+        this.state.notes.push(res.data)
+      }
+      catch (e) {
+        console.log(e.response)
+      }
+    },
   },
   modules: {
   }

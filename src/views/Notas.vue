@@ -88,10 +88,8 @@ export default {
       this.showAlert();
     },
     agregarNota() {
-      this.axios.post("/nueva-nota", this.nota)
+      this.$store.dispatch('postNotes', this.nota)
         .then(res => {
-          console.log(res.data)
-          this.$store.state.notes.push(res.data)
           this.nota.nombre = "";
           this.nota.descripcion = "";
           this.mensaje.color = "success";
