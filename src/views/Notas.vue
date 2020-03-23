@@ -45,7 +45,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(nota, index) in notas" :key="index">
+        <tr v-for="(nota, index) in notes" :key="index">
           <th scope="row">{{ nota._id }}</th>
           <td>{{ nota.nombre }}</td>
           <td>{{ nota.descripcion }}</td>
@@ -61,6 +61,8 @@
 </template>
 
 <script>
+import {mapState} from "vuex";
+
 export default {
   data() {
     return {
@@ -73,8 +75,11 @@ export default {
       editar : false,
     };
   },
-  created() {
-    this.listarNotas();
+  created(){ // en mejor que mounted para cargar desde api
+    this.$store.dispatch('getNotes')
+  },
+  computed:{
+       ...mapState(['notes']),
   },
   methods: {
     alerta() {
@@ -82,21 +87,11 @@ export default {
       this.mensaje.texto = "Probando alerta";
       this.showAlert();
     },
-    listarNotas() {
-      this.axios.get("/notas")
-        .then(res => {
-          console.table(res.data);
-          this.notas = res.data;
-        })
-        .catch(e => {
-          console.log(e.response);
-        });
-    },
     agregarNota() {
       this.axios.post("/nueva-nota", this.nota)
         .then(res => {
           console.log(res.data)
-          this.notas.push(res.data);
+          this.$store.state.notes.push(res.data)
           this.nota.nombre = "";
           this.nota.descripcion = "";
           this.mensaje.color = "success";
