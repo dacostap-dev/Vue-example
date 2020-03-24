@@ -45,16 +45,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(nota, index) in notes" :key="index">
-          <th scope="row">{{ nota._id }}</th>
-          <td>{{ nota.nombre }}</td>
-          <td>{{ nota.descripcion }}</td>
-          <td>
-       <!--      <b-button @click="alerta">Accion</b-button> -->
-            <b-button @click="activarEdicion(nota._id)" class="btn-warning btn-sm mx-2">Editar</b-button>
-            <b-button @click="eliminarNota(nota._id)" class="btn-danger btn-sm">Eliminar</b-button>
-          </td>
-        </tr>
+         <Nota v-for="(nota, index) in notes" :key="index" :nota="nota"></Nota>
       </tbody>
     </table>
   </div>
@@ -62,6 +53,7 @@
 
 <script>
 import {mapState} from "vuex";
+import Nota from "@/components/NoteComponent.vue";
 
 export default {
   data() {
@@ -74,6 +66,9 @@ export default {
       dismissCountDown: 0,
       editar : false,
     };
+  },
+  components: {
+      Nota,
   },
   created(){ // en mejor que mounted para cargar desde api
     this.$store.dispatch('getNotes')
@@ -126,20 +121,6 @@ export default {
           this.mensaje.texto = "Nota actualizada";
           this.showAlert();
           this.editar = false;
-        })
-        .catch(e => {
-          console.log(e.response)
-        })
-    },
-    eliminarNota(id){
-      console.log(id)
-      this.axios.delete('/nota/'+ id).
-        then(res => {
-          const index = this.notas.findIndex(item => item._id === res.data._id) //obtenemos el index del elemento que coincide con el que eliminamos
-          this.notas.splice(index, 1)
-          this.mensaje.color = "success";
-          this.mensaje.texto = "Nota eliminada";
-          this.showAlert()
         })
         .catch(e => {
           console.log(e.response)

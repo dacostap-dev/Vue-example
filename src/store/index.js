@@ -8,11 +8,16 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    notes: []
+    notes: [],
+    noteSelected: "",
   },
   mutations: {
     NotesList(state, notes){
       state.notes = notes
+    },
+    NoteDelete(state, note){
+      const index = state.notes.findIndex(item => item._id === note._id); //obtenemos el index del elemento que coincide con el que eliminamos
+      state.notes.splice(index, 1);
     },
   },
   actions: {
@@ -20,6 +25,7 @@ export default new Vuex.Store({
       try {
         const res = await axios.get("/notas")
         context.commit('NotesList', res.data)
+        console.log(res.data)
       }
       catch (e) {
         console.log(e.response)
@@ -34,6 +40,16 @@ export default new Vuex.Store({
         console.log(e.response)
       }
     },
+    async deleteNotes(context, params){
+      try {
+        const res = await axios
+          .delete("/nota/" + params._id)
+        context.commit('NoteDelete', res.data._id)
+      }
+      catch (e) {
+        console.log(e.response)
+      }
+    }
   },
   modules: {
   }
