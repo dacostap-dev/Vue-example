@@ -5,19 +5,18 @@
     <b-alert
       :show="dismissCountDown"
       dismissible
-      :variant="mensaje.color"
+      :variant="message.color"
       @dismissed="dismissCountDown=0"
-      @dismiss-count-down="countDownChanged"
-    >{{mensaje.texto}}</b-alert>
+      @dismiss-count-down="countDownChanged"> {{ message.text }} </b-alert>
 
-    <form @submit.prevent="editarNota(notaEditar)" v-if="editar">
+    <form @submit.prevent="editarNota()" v-if="editar">
       <h3>Editar Nota</h3>
-      <input type="text" class="form-control my-2" placeholder="Nombre" v-model="notaEditar.nombre" />
+      <input type="text" class="form-control my-2" placeholder="Nombre" v-model="modelEdit.nombre" />
       <input
         type="text"
         class="form-control my-2"
         placeholder="Descripcion"
-        v-model="notaEditar.descripcion"
+        v-model="modelEdit.descripcion"
       />
       <b-button class="btn-warning my-2 btn-block" type="submit">Editar</b-button>
       <b-button class="my-2 btn-block" @click="editar = false">Cancelar</b-button>
@@ -60,11 +59,6 @@ export default {
     return {
       notas: [],
       nota: { nombre: "", descripcion: "" },
-      notaEditar: {_id: "", nombre: "", descripcion: ""},
-      mensaje: { color: "success", texto: "" },
-      dismissSecs: 5,
-      dismissCountDown: 0,
-      editar : false,
     };
   },
   components: {
@@ -74,64 +68,34 @@ export default {
     this.$store.dispatch('getNotes')
   },
   computed:{
-       ...mapState(['notes']),
+       ...mapState(['notes', 'message', 'dismissSecs', 'dismissCountDown', 'editar','modelEdit']),
   },
   methods: {
-    alerta() {
-      this.mensaje.color = "success";
-      this.mensaje.texto = "Probando alerta";
-      this.showAlert();
-    },
     agregarNota() {
       this.$store.dispatch('postNotes', this.nota)
         .then(res => {
           this.nota.nombre = "";
           this.nota.descripcion = "";
-          this.mensaje.color = "success";
-          this.mensaje.texto = "Nota agregada";
-          this.showAlert()
+          this.$store.commit('SetMessage', {texto: 'Nota Agregada', color: 'success'})
         })
         .catch(e => {
           console.log(e.response);
-          this.mensaje.color = "danger";
-          this.mensaje.texto = e.response.data.mensaje;
-          this.showAlert()
+          this.$store.commit('SetMessage', {texto: 'Algo falló', color: 'danger'})
         });
     },
-    activarEdicion(id){
-      this.editar = true;
-      console.log(id)
-      this.axios.put('/nota/'+id)
-      .then(res => {
-        console.log(res)
-        this.notaEditar._id = res.data._id;
-        this.notaEditar.nombre = res.data.nombre;
-        this.notaEditar.descripcion = res.data.descripcion;
-      }).catch(e => {
-        console.log(e.response)
-      })
-    },
-    editarNota(nota){
-      this.axios.put('/nota/'+ nota._id, nota)
+    editarNota(){
+      this.$store.dispatch('updateNote', this.modelEdit)
         .then(res => {
-          const index = this.notas.findIndex(n => n._id == res.data._id);
-          this.notas[index].nombre = res.data.nombre;
-          this.notas[index].descripcion = res.data.descripcion;
-          this.mensaje.color = "success";
-          this.mensaje.texto = "Nota actualizada";
-          this.showAlert();
-          this.editar = false;
+          this.$store.commit('SetMessage', {texto: 'Nota Actualizada', color: 'success'})
+          this.$store.state.editar = false;
         })
         .catch(e => {
           console.log(e.response)
         })
     },
     countDownChanged(dismissCountDown) { //propio de alert
-      this.dismissCountDown = dismissCountDown;
+      this.$store.state.dismissCountDown = dismissCountDown;
     },
-    showAlert() { //propio de alert
-      this.dismissCountDown = this.dismissSecs;
-    }
   }
 };
 </script>
