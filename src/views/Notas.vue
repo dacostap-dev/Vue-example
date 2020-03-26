@@ -18,7 +18,7 @@
         v-model="modelEdit.descripcion"
       />
       <b-button class="btn-warning my-2 btn-block" type="submit">Editar</b-button>
-      <b-button class="my-2 btn-block" @click="editar = false">Cancelar</b-button>
+      <b-button class="my-2 btn-block" @click="cancelarEditar()">Cancelar</b-button>
     </form>
 
     <form @submit.prevent="agregarNota()" v-if="!editar">
@@ -91,6 +91,10 @@ export default {
         .catch(e => {
           console.log(e.response)
         })
+    },
+    cancelarEditar() {
+      this.$store.state.editar = false;
+      this.$store.commit('ModelEdit', null) ;
     },
     countDownChanged(dismissCountDown) { //propio de alert
       this.$store.state.dismissCountDown = dismissCountDown;
