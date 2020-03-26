@@ -2,11 +2,7 @@
   <div class="container">
     <h1>Notas</h1>
 
-    <b-alert
-      :show="dismissCountDown"
-      dismissible
-      :variant="message.color"
-      @dismiss-count-down="countDownChanged"> {{ message.text }} </b-alert>
+    <MessageComponent/> 
 
     <form @submit.prevent="editarNota()" v-if="editar">
       <h3>Editar Nota</h3>
@@ -52,6 +48,7 @@
 <script>
 import {mapState} from "vuex";
 import Nota from "@/components/NoteComponent.vue";
+import MessageComponent from "@/components/MessageComponent.vue";
 
 export default {
   data() {
@@ -62,12 +59,13 @@ export default {
   },
   components: {
       Nota,
+      MessageComponent
   },
   created(){ // en mejor que mounted para cargar desde api
     this.$store.dispatch('getNotes')
   },
   computed:{
-       ...mapState(['notes', 'message', 'dismissSecs', 'dismissCountDown', 'editar','modelEdit']),
+       ...mapState(['notes', 'message', 'editar','modelEdit']),
   },
   methods: {
     agregarNota() {
@@ -95,9 +93,6 @@ export default {
     cancelarEditar() {
       this.$store.state.editar = false;
       this.$store.commit('ModelEdit', null) ;
-    },
-    countDownChanged(dismissCountDown) { //propio de alert
-      this.$store.state.dismissCountDown = dismissCountDown;
     },
   }
 };
