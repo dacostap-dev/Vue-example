@@ -23,6 +23,9 @@ export default new Vuex.Store({
     ModelEdit(state, model){
       state.modelEdit = model
     },
+    NoteStore(state, note){
+      state.notes.push(note)
+    },
     NoteUpdate(state, note){
       const index = state.notes.findIndex(n => n._id == note._id);
       state.notes[index].nombre = note.nombre;
@@ -52,7 +55,7 @@ export default new Vuex.Store({
     async postNotes(context, params) {
       try {
         const res = await axios.post("/nueva-nota", params)
-        this.state.notes.push(res.data)
+        context.commit('NoteStore', res.data)
       }
       catch (e) {
         console.log(e.response)
@@ -72,7 +75,7 @@ export default new Vuex.Store({
       try {
         const res = await axios
           .delete("/nota/" + params._id)
-        context.commit('NoteDelete', res.data._id)
+        context.commit('NoteDelete', res.data)
       }
       catch (e) {
         console.log(e.response)

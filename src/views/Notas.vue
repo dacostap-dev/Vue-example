@@ -6,7 +6,6 @@
       :show="dismissCountDown"
       dismissible
       :variant="message.color"
-      @dismissed="dismissCountDown=0"
       @dismiss-count-down="countDownChanged"> {{ message.text }} </b-alert>
 
     <form @submit.prevent="editarNota()" v-if="editar">
